@@ -3,12 +3,12 @@
     "description": "Generate dungeons, wilderness, battle maps, and city scenes directly in Owlbear Rodeo with seeded procedural generation.",
     "version": "1.0.0",
     "author": "Zenith-Wahl Campaign Tools",
-    "icon": "https://owlbear-random-map-generator.onrender.com/icon.svg",
+    "icon": "icon.svg",
     "manifest_version": 1,
     "action": {
         "title": "Map Generator",
-        "icon": "https://owlbear-random-map-generator.onrender.com/icon.svg",
-        "popover": "https://owlbear-random-map-generator.onrender.com/index.html",
+        "icon": "icon.svg",
+        "popover": "index.html",
         "height": 600,
         "width": 400
     }
