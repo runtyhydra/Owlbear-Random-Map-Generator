@@ -6,148 +6,29 @@
     <title>Map Generator</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;500;600&display=swap');
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --bg: #0f1419;
-            --bg-elevated: #1a1f2e;
-            --border: #2d3748;
-            --accent: #d4af37;
-            --accent-hover: #b8942e;
-            --text-primary: #e8e6e3;
-            --text-secondary: #a8a29e;
+            --bg: #0f1419; --bg-elevated: #1a1f2e; --border: #2d3748;
+            --accent: #d4af37; --accent-hover: #b8942e;
+            --text-primary: #e8e6e3; --text-secondary: #a8a29e;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text-primary);
-            padding: 1.5rem;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        h2 {
-            font-family: 'Cinzel', serif;
-            color: var(--accent);
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        .section {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .section h3 {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 0.75rem;
-        }
-
-        label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.4rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input[type="number"],
-        input[type="text"],
-        select {
-            width: 100%;
-            padding: 0.6rem;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            margin-bottom: 0.75rem;
-            transition: border-color 0.2s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .preset-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .preset-btn {
-            padding: 0.5rem;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            color: var(--text-primary);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .preset-btn:hover {
-            border-color: var(--accent);
-            background: var(--bg-elevated);
-        }
-
-        button {
-            width: 100%;
-            padding: 0.9rem;
-            background: var(--accent);
-            border: none;
-            border-radius: 6px;
-            color: var(--bg);
-            font-family: 'Cinzel', serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-primary); padding: 1.5rem; height: 100vh; overflow-y: auto; }
+        h2 { font-family: 'Cinzel', serif; color: var(--accent); font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; }
+        .section { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        .section h3 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 0.75rem; }
+        label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        input[type="number"], input[type="text"], select { width: 100%; padding: 0.6rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-family: 'Inter', sans-serif; font-size: 0.9rem; margin-bottom: 0.75rem; transition: border-color 0.2s; }
+        input:focus, select:focus { outline: none; border-color: var(--accent); }
+        .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .preset-btn { padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+        .preset-btn:hover { border-color: var(--accent); background: var(--bg-elevated); }
+        button { width: 100%; padding: 0.9rem; background: var(--accent); border: none; border-radius: 6px; color: var(--bg); font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px; }
         button:hover { background: var(--accent-hover); transform: translateY(-1px); }
         button:active { transform: translateY(0); }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .status {
-            text-align: center;
-            padding: 0.75rem;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            margin-top: 1rem;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        .status.generating {
-            color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .seed-display {
-            font-family: monospace;
-            font-size: 0.75rem;
-            color: var(--accent);
-            text-align: center;
-            margin-top: 0.5rem;
-        }
+        .status { text-align: center; padding: 0.75rem; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 6px; margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary); }
+        .status.generating { color: var(--accent); border-color: var(--accent); }
+        .seed-display { font-family: monospace; font-size: 0.75rem; color: var(--accent); text-align: center; margin-top: 0.5rem; }
     </style>
 </head>
 <body>
@@ -193,30 +74,30 @@
     </div>
 
     <button id="generateBtn" onclick="generateAndAddMap()">Generate Map in Scene</button>
-    <div class="status" id="status">Loading...</div>
+    <div class="status" id="status">Loading SDK...</div>
 
-    <script type="module">
-        import OBR from 'https://unpkg.com/@owlbear-rodeo/sdk@2.3.0/dist/index.js';
-        window.OBR = OBR;
+    <script src="https://owlbear-random-map-generator.onrender.com/map-generator.js"></script>
+    <script src="https://unpkg.com/@owlbear-rodeo/sdk@latest/dist/index.global.js"
+            onerror="document.getElementById('status').textContent = 'Failed to load OBR SDK';"></script>
+    <script>
+        let currentSeed = null;
 
         function loadPreset(size) {
             const sizes = { small: 20, medium: 30, large: 40, huge: 50 };
             document.getElementById('width').value = sizes[size];
             document.getElementById('height').value = sizes[size];
         }
-        window.loadPreset = loadPreset;
 
         function setStatus(message, generating = false) {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.className = generating ? 'status generating' : 'status';
+            const el = document.getElementById('status');
+            el.textContent = message;
+            el.className = generating ? 'status generating' : 'status';
         }
 
         async function generateAndAddMap() {
             const btn = document.getElementById('generateBtn');
             btn.disabled = true;
             setStatus('Generating map...', true);
-
             try {
                 const width = parseInt(document.getElementById('width').value);
                 const height = parseInt(document.getElementById('height').value);
@@ -224,7 +105,7 @@
                 const mapType = document.getElementById('mapType').value;
                 const seedInput = document.getElementById('seed').value;
 
-                const currentSeed = seedInput || Date.now().toString();
+                currentSeed = seedInput || Date.now().toString();
                 document.getElementById('seedDisplay').textContent = `Seed: ${currentSeed}`;
 
                 const canvas = document.createElement('canvas');
@@ -261,57 +142,42 @@
 
                     const items = [];
                     wallData.walls.forEach(wall => {
-                        items.push(
-                            OBR.buildPath()
-                                .points(wall.points)
-                                .strokeColor('#000000')
-                                .strokeWidth(5)
-                                .locked(true)
-                                .layer('DRAWING')
-                                .metadata({ 'com.battle-system.dynamic-fog/isVisionLine': true })
-                                .build()
-                        );
+                        items.push(OBR.scene.items.createPath({
+                            points: wall.points,
+                            strokeColor: '#000000',
+                            strokeWidth: 5,
+                            locked: true,
+                            layer: 'DRAWING',
+                            metadata: { 'com.battle-system.dynamic-fog/isVisionLine': true }
+                        }));
                     });
-                    wallData.lights.forEach(light => {
-                        items.push(
-                            OBR.buildPath()
-                                .position(light.position)
-                                .scale({ x: light.radius, y: light.radius })
-                                .fillColor('#FFFF00')
-                                .fillOpacity(0.1)
-                                .strokeColor('#FFD700')
-                                .strokeWidth(2)
-                                .locked(true)
-                                .layer('DRAWING')
-                                .metadata({
-                                    'com.battle-system.dynamic-fog/isLight': true,
-                                    'com.battle-system.dynamic-fog/lightRadius': light.radius
-                                })
-                                .build()
-                        );
-                    });
-
                     if (items.length > 0) await OBR.scene.items.addItems(items);
 
-                    setStatus('✓ Map created with walls & lights!');
+                    setStatus('✓ Map created!');
                     setTimeout(() => setStatus('Ready to generate'), 3000);
                 } else {
                     throw new Error('Failed to upload image');
                 }
             } catch (error) {
-                console.error('Error generating map:', error);
-                setStatus('✗ Error: ' + error.message);
+                console.error(error);
+                setStatus('✗ ' + error.message);
                 setTimeout(() => setStatus('Ready to generate'), 3000);
             } finally {
                 btn.disabled = false;
             }
         }
-        window.generateAndAddMap = generateAndAddMap;
 
-        OBR.onReady(() => {
-            setStatus('Ready to generate');
-        });
+        if (typeof OBR !== 'undefined') {
+            OBR.onReady(() => setStatus('Ready to generate'));
+        } else {
+            window.addEventListener('load', () => {
+                if (typeof OBR !== 'undefined') {
+                    OBR.onReady(() => setStatus('Ready to generate'));
+                } else {
+                    setStatus('OBR SDK failed to load');
+                }
+            });
+        }
     </script>
-    <script src="https://owlbear-random-map-generator.onrender.com/map-generator.js"></script>
 </body>
 </html>
