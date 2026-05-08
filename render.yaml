@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: owlbear-random-map-generator
+    env: static
+    buildCommand: ""
+    staticPublishPath: "."
+    headers:
+      - path: "/*"
+        name: Access-Control-Allow-Origin
+        value: "*"
