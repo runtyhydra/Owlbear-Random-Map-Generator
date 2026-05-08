@@ -7,11 +7,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;500;600&display=swap');
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --bg: #0f1419;
@@ -81,8 +77,7 @@
             transition: border-color 0.2s;
         }
 
-        input:focus,
-        select:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: var(--accent);
         }
@@ -126,19 +121,9 @@
             letter-spacing: 1px;
         }
 
-        button:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        button:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .status {
             text-align: center;
@@ -176,7 +161,6 @@
             <option value="battlemap">Battle Map</option>
             <option value="city">City/Town</option>
         </select>
-
         <label>Size Preset</label>
         <div class="preset-grid">
             <button class="preset-btn" onclick="loadPreset('small')">Small (20x20)</button>
@@ -190,7 +174,6 @@
         <h3>Dimensions</h3>
         <label>Width (tiles)</label>
         <input type="number" id="width" value="30" min="10" max="100">
-        
         <label>Height (tiles)</label>
         <input type="number" id="height" value="30" min="10" max="100">
     </div>
@@ -210,22 +193,18 @@
     </div>
 
     <button id="generateBtn" onclick="generateAndAddMap()">Generate Map in Scene</button>
+    <div class="status" id="status">Loading...</div>
 
-    <div class="status" id="status">Ready to generate</div>
-
-    <script src="https://unpkg.com/@owlbear-rodeo/sdk@latest/dist/index.global.js"></script>
-    <script src="map-generator.js"></script>
-    <script>
-        // Make OBR builders globally available
-        window.buildPath = window.OBR?.buildPath;
-        
-        let currentSeed = null;
+    <script type="module">
+        import OBR from 'https://unpkg.com/@owlbear-rodeo/sdk@2.3.0/dist/index.js';
+        window.OBR = OBR;
 
         function loadPreset(size) {
             const sizes = { small: 20, medium: 30, large: 40, huge: 50 };
             document.getElementById('width').value = sizes[size];
             document.getElementById('height').value = sizes[size];
         }
+        window.loadPreset = loadPreset;
 
         function setStatus(message, generating = false) {
             const status = document.getElementById('status');
@@ -244,96 +223,75 @@
                 const dpi = parseInt(document.getElementById('dpi').value);
                 const mapType = document.getElementById('mapType').value;
                 const seedInput = document.getElementById('seed').value;
-                
-                currentSeed = seedInput || Date.now().toString();
+
+                const currentSeed = seedInput || Date.now().toString();
                 document.getElementById('seedDisplay').textContent = `Seed: ${currentSeed}`;
 
-                // Generate map on canvas
                 const canvas = document.createElement('canvas');
                 canvas.width = width * dpi;
                 canvas.height = height * dpi;
                 const ctx = canvas.getContext('2d');
-
                 const rng = new SeededRandom(parseInt(currentSeed));
 
                 switch(mapType) {
-                    case 'dungeon':
-                        generateDungeon(ctx, width, height, dpi, rng);
-                        break;
-                    case 'wilderness':
-                        generateWilderness(ctx, width, height, dpi, rng);
-                        break;
-                    case 'battlemap':
-                        generateBattleMap(ctx, width, height, dpi, rng);
-                        break;
-                    case 'city':
-                        generateCity(ctx, width, height, dpi, rng);
-                        break;
+                    case 'dungeon':    generateDungeon(ctx, width, height, dpi, rng); break;
+                    case 'wilderness': generateWilderness(ctx, width, height, dpi, rng); break;
+                    case 'battlemap': generateBattleMap(ctx, width, height, dpi, rng); break;
+                    case 'city':      generateCity(ctx, width, height, dpi, rng); break;
                 }
 
                 const wallData = getWallsFromGeneration(mapType, width, height, dpi, rng);
-                
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                
+
                 setStatus('Uploading to Owlbear...', true);
-                
                 const images = await OBR.assets.uploadImages([
                     new File([blob], `${mapType}-${currentSeed}.png`, { type: 'image/png' })
                 ]);
 
                 if (images && images.length > 0) {
                     setStatus('Creating scene...', true);
-                    
                     await OBR.scene.create({
                         name: `${mapType.charAt(0).toUpperCase() + mapType.slice(1)} - ${currentSeed.slice(0, 8)}`,
                         image: images[0],
-                        grid: {
-                            dpi: dpi,
-                            type: 'SQUARE'
-                        }
+                        grid: { dpi: dpi, type: 'SQUARE' }
                     });
 
                     await new Promise(resolve => setTimeout(resolve, 500));
-
                     setStatus('Adding walls and lights...', true);
 
                     const items = [];
-                    
                     wallData.walls.forEach(wall => {
-                        items.push(window.buildPath()
-                            .points(wall.points)
-                            .strokeColor("#000000")
-                            .strokeWidth(5)
-                            .locked(true)
-                            .layer("DRAWING")
-                            .metadata({
-                                'com.battle-system.dynamic-fog/isVisionLine': true
-                            })
-                            .build()
+                        items.push(
+                            OBR.buildPath()
+                                .points(wall.points)
+                                .strokeColor('#000000')
+                                .strokeWidth(5)
+                                .locked(true)
+                                .layer('DRAWING')
+                                .metadata({ 'com.battle-system.dynamic-fog/isVisionLine': true })
+                                .build()
                         );
                     });
-
                     wallData.lights.forEach(light => {
-                        items.push(window.buildPath()
-                            .position(light.position)
-                            .scale({ x: light.radius, y: light.radius })
-                            .fillColor("#FFFF00")
-                            .fillOpacity(0.1)
-                            .strokeColor("#FFD700")
-                            .strokeWidth(2)
-                            .locked(true)
-                            .layer("DRAWING")
-                            .metadata({
-                                'com.battle-system.dynamic-fog/isLight': true,
-                                'com.battle-system.dynamic-fog/lightRadius': light.radius
-                            })
-                            .build()
+                        items.push(
+                            OBR.buildPath()
+                                .position(light.position)
+                                .scale({ x: light.radius, y: light.radius })
+                                .fillColor('#FFFF00')
+                                .fillOpacity(0.1)
+                                .strokeColor('#FFD700')
+                                .strokeWidth(2)
+                                .locked(true)
+                                .layer('DRAWING')
+                                .metadata({
+                                    'com.battle-system.dynamic-fog/isLight': true,
+                                    'com.battle-system.dynamic-fog/lightRadius': light.radius
+                                })
+                                .build()
                         );
                     });
 
-                    if (items.length > 0) {
-                        await OBR.scene.items.addItems(items);
-                    }
+                    if (items.length > 0) await OBR.scene.items.addItems(items);
 
                     setStatus('✓ Map created with walls & lights!');
                     setTimeout(() => setStatus('Ready to generate'), 3000);
@@ -348,10 +306,12 @@
                 btn.disabled = false;
             }
         }
+        window.generateAndAddMap = generateAndAddMap;
 
         OBR.onReady(() => {
             setStatus('Ready to generate');
         });
     </script>
+    <script src="https://owlbear-random-map-generator.onrender.com/map-generator.js"></script>
 </body>
 </html>
