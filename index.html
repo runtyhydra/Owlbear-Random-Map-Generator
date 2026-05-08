@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Generator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0f1419;
+            --bg-elevated: #1a1f2e;
+            --border: #2d3748;
+            --accent: #d4af37;
+            --accent-hover: #b8942e;
+            --text-primary: #e8e6e3;
+            --text-secondary: #a8a29e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            padding: 1.5rem;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .section {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .section h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .preset-btn {
+            padding: 0.5rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-elevated);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--accent);
+            border: none;
+            border-radius: 6px;
+            color: var(--bg);
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .status.generating {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .seed-display {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h2>Procedural Map Generator</h2>
+
+    <div class="section">
+        <h3>Map Type</h3>
+        <select id="mapType">
+            <option value="dungeon">Dungeon</option>
+            <option value="wilderness">Wilderness</option>
+            <option value="battlemap">Battle Map</option>
+            <option value="city">City/Town</option>
+        </select>
+
+        <label>Size Preset</label>
+        <div class="preset-grid">
+            <button class="preset-btn" onclick="loadPreset('small')">Small (20x20)</button>
+            <button class="preset-btn" onclick="loadPreset('medium')">Medium (30x30)</button>
+            <button class="preset-btn" onclick="loadPreset('large')">Large (40x40)</button>
+            <button class="preset-btn" onclick="loadPreset('huge')">Huge (50x50)</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Dimensions</h3>
+        <label>Width (tiles)</label>
+        <input type="number" id="width" value="30" min="10" max="100">
+        
+        <label>Height (tiles)</label>
+        <input type="number" id="height" value="30" min="10" max="100">
+    </div>
+
+    <div class="section">
+        <h3>Grid Settings</h3>
+        <label>Pixels per Tile</label>
+        <input type="number" id="dpi" value="150" min="100" max="300" step="50">
+        <small style="color: var(--text-secondary); font-size: 0.75rem;">Higher DPI = better quality, larger file</small>
+    </div>
+
+    <div class="section">
+        <h3>Generation Seed</h3>
+        <label>Seed (blank for random)</label>
+        <input type="text" id="seed" placeholder="Leave empty for random">
+        <div class="seed-display" id="seedDisplay"></div>
+    </div>
+
+    <button id="generateBtn" onclick="generateAndAddMap()">Generate Map in Scene</button>
+
+    <div class="status" id="status">Ready to generate</div>
+
+    <script src="https://unpkg.com/@owlbear-rodeo/sdk@latest/dist/index.global.js"></script>
+    <script src="/map-generator.js"></script>
+    <script>
+        // Make OBR builders globally available
+        window.buildPath = window.OBR?.buildPath;
+        
+        let currentSeed = null;
+
+        function loadPreset(size) {
+            const sizes = { small: 20, medium: 30, large: 40, huge: 50 };
+            document.getElementById('width').value = sizes[size];
+            document.getElementById('height').value = sizes[size];
+        }
+
+        function setStatus(message, generating = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = generating ? 'status generating' : 'status';
+        }
+
+        async function generateAndAddMap() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            setStatus('Generating map...', true);
+
+            try {
+                const width = parseInt(document.getElementById('width').value);
+                const height = parseInt(document.getElementById('height').value);
+                const dpi = parseInt(document.getElementById('dpi').value);
+                const mapType = document.getElementById('mapType').value;
+                const seedInput = document.getElementById('seed').value;
+                
+                currentSeed = seedInput || Date.now().toString();
+                document.getElementById('seedDisplay').textContent = `Seed: ${currentSeed}`;
+
+                // Generate map on canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = width * dpi;
+                canvas.height = height * dpi;
+                const ctx = canvas.getContext('2d');
+
+                const rng = new SeededRandom(parseInt(currentSeed));
+
+                // Generate based on type
+                switch(mapType) {
+                    case 'dungeon':
+                        generateDungeon(ctx, width, height, dpi, rng);
+                        break;
+                    case 'wilderness':
+                        generateWilderness(ctx, width, height, dpi, rng);
+                        break;
+                    case 'battlemap':
+                        generateBattleMap(ctx, width, height, dpi, rng);
+                        break;
+                    case 'city':
+                        generateCity(ctx, width, height, dpi, rng);
+                        break;
+                }
+
+                // Get wall data from generation
+                const wallData = getWallsFromGeneration(mapType, width, height, dpi, rng);
+                
+                // Convert canvas to blob
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                
+                // Upload to Owlbear Rodeo
+                setStatus('Uploading to Owlbear...', true);
+                
+                const images = await OBR.assets.uploadImages([
+                    new File([blob], `${mapType}-${currentSeed}.png`, { type: 'image/png' })
+                ]);
+
+                if (images && images.length > 0) {
+                    setStatus('Creating scene...', true);
+                    
+                    // Create new scene with the map
+                    await OBR.scene.create({
+                        name: `${mapType.charAt(0).toUpperCase() + mapType.slice(1)} - ${currentSeed.slice(0, 8)}`,
+                        image: images[0],
+                        grid: {
+                            dpi: dpi,
+                            type: 'SQUARE'
+                        }
+                    });
+
+                    // Wait for scene to be ready
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    setStatus('Adding walls and lights...', true);
+
+                    // Add walls and lights
+                    const items = [];
+                    
+                    // Create walls (for Dynamic Fog extension)
+                    wallData.walls.forEach(wall => {
+                        items.push(window.buildPath()
+                            .points(wall.points)
+                            .strokeColor("#000000")
+                            .strokeWidth(5)
+                            .locked(true)
+                            .layer("DRAWING")
+                            .metadata({
+                                'com.battle-system.dynamic-fog/isVisionLine': true
+                            })
+                            .build()
+                        );
+                    });
+
+                    // Create lights
+                    wallData.lights.forEach(light => {
+                        items.push(window.buildPath()
+                            .position(light.position)
+                            .scale({ x: light.radius, y: light.radius })
+                            .fillColor("#FFFF00")
+                            .fillOpacity(0.1)
+                            .strokeColor("#FFD700")
+                            .strokeWidth(2)
+                            .locked(true)
+                            .layer("DRAWING")
+                            .metadata({
+                                'com.battle-system.dynamic-fog/isLight': true,
+                                'com.battle-system.dynamic-fog/lightRadius': light.radius
+                            })
+                            .build()
+                        );
+                    });
+
+                    if (items.length > 0) {
+                        await OBR.scene.items.addItems(items);
+                    }
+
+                    setStatus('✓ Map created with walls & lights!');
+                    setTimeout(() => setStatus('Ready to generate'), 3000);
+                } else {
+                    throw new Error('Failed to upload image');
+                }
+            } catch (error) {
+                console.error('Error generating map:', error);
+                setStatus('✗ Error: ' + error.message);
+                setTimeout(() => setStatus('Ready to generate'), 3000);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize when Owlbear is ready
+        OBR.onReady(() => {
+            setStatus('Ready to generate');
+        });
+    </script>
+</body>
+</html>
