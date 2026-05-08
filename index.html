@@ -214,7 +214,7 @@
     <div class="status" id="status">Ready to generate</div>
 
     <script src="https://unpkg.com/@owlbear-rodeo/sdk@latest/dist/index.global.js"></script>
-    <script src="/map-generator.js"></script>
+    <script src="map-generator.js"></script>
     <script>
         // Make OBR builders globally available
         window.buildPath = window.OBR?.buildPath;
@@ -256,7 +256,6 @@
 
                 const rng = new SeededRandom(parseInt(currentSeed));
 
-                // Generate based on type
                 switch(mapType) {
                     case 'dungeon':
                         generateDungeon(ctx, width, height, dpi, rng);
@@ -272,13 +271,10 @@
                         break;
                 }
 
-                // Get wall data from generation
                 const wallData = getWallsFromGeneration(mapType, width, height, dpi, rng);
                 
-                // Convert canvas to blob
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
                 
-                // Upload to Owlbear Rodeo
                 setStatus('Uploading to Owlbear...', true);
                 
                 const images = await OBR.assets.uploadImages([
@@ -288,7 +284,6 @@
                 if (images && images.length > 0) {
                     setStatus('Creating scene...', true);
                     
-                    // Create new scene with the map
                     await OBR.scene.create({
                         name: `${mapType.charAt(0).toUpperCase() + mapType.slice(1)} - ${currentSeed.slice(0, 8)}`,
                         image: images[0],
@@ -298,15 +293,12 @@
                         }
                     });
 
-                    // Wait for scene to be ready
                     await new Promise(resolve => setTimeout(resolve, 500));
 
                     setStatus('Adding walls and lights...', true);
 
-                    // Add walls and lights
                     const items = [];
                     
-                    // Create walls (for Dynamic Fog extension)
                     wallData.walls.forEach(wall => {
                         items.push(window.buildPath()
                             .points(wall.points)
@@ -321,7 +313,6 @@
                         );
                     });
 
-                    // Create lights
                     wallData.lights.forEach(light => {
                         items.push(window.buildPath()
                             .position(light.position)
@@ -358,7 +349,6 @@
             }
         }
 
-        // Initialize when Owlbear is ready
         OBR.onReady(() => {
             setStatus('Ready to generate');
         });
