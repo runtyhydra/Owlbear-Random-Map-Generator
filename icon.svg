@@ -1,0 +1,33 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4af37;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b8942e;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="128" height="128" fill="#0f1419" rx="16"/>
+  
+  <!-- Grid pattern -->
+  <g stroke="url(#goldGrad)" stroke-width="3" fill="none" opacity="0.6">
+    <line x1="32" y1="32" x2="96" y2="32"/>
+    <line x1="32" y1="56" x2="96" y2="56"/>
+    <line x1="32" y1="80" x2="96" y2="80"/>
+    <line x1="32" y1="32" x2="32" y2="96"/>
+    <line x1="56" y1="32" x2="56" y2="96"/>
+    <line x1="80" y1="32" x2="80" y2="96"/>
+  </g>
+  
+  <!-- Map/dungeon symbol -->
+  <path d="M 40 40 L 60 40 L 60 52 L 72 52 L 72 72 L 52 72 L 52 60 L 40 60 Z" 
+        fill="url(#goldGrad)" opacity="0.8"/>
+  
+  <!-- Sparkle effect -->
+  <circle cx="88" cy="44" r="3" fill="#d4af37">
+    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="44" cy="88" r="2.5" fill="#d4af37">
+    <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>

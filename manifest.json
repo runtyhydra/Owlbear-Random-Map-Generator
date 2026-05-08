@@ -1,0 +1,16 @@
+{
+  "manifest_version": 1,
+  "id": "com.zenithwahl.procgen-maps",
+  "name": "Procedural Map Generator",
+  "version": "1.0.0",
+  "author": "Zenith-Wahl Campaign Tools",
+  "description": "Generate dungeons, wilderness, battle maps, and city scenes directly in Owlbear Rodeo with seeded procedural generation.",
+  "icon": "/icon.svg",
+  "action": {
+    "title": "Map Generator",
+    "icon": "/icon.svg",
+    "popover": "/index.html",
+    "height": 600,
+    "width": 400
+  }
+}
